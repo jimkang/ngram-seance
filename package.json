@@ -1,0 +1,33 @@
+{
+  "name": "ngram-seance",
+  "version": "1.0.0",
+  "description": "Holds seances to communicate with the realm of Google N-grams",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jimkang/ngram-seance.git"
+  },
+  "keywords": [],
+  "author": "Jim Kang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jimkang/ngram-seance/issues"
+  },
+  "homepage": "https://github.com/jimkang/ngram-seance",
+  "devDependencies": {
+    "tape": "^3.0.3"
+  },
+  "dependencies": {
+    "async": "^0.9.0",
+    "basicset-chronicler": "^1.3.1",
+    "better-know-a-tweet": "^1.0.1",
+    "call-next-tick": "^1.1.2",
+    "emojisource": "^1.0.0",
+    "iscool": "^1.1.11",
+    "twit": "^1.1.20",
+    "wander-google-ngrams": "^2.0.0"
+  }
+}
