@@ -28,6 +28,10 @@ stream.on('tweet', respondToTweet);
 
 function respondToTweet(tweet) {
   debugger;
+  if (tweet.user.screen_name === username) {
+    return;
+  }
+
   var usernames = betterKnowATweet.whosInTheTweet(tweet);
   if (!usernames || usernames.indexOf(username) === -1) {
     return;
