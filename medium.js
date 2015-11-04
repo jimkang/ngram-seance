@@ -57,11 +57,9 @@ function respondToTweet(tweet) {
     [
       goFindLastReplyDate,
       replyDateWasNotTooRecent,
-      composeStartMessage,
-      postTweet,
       pickWord,
       runSeance,
-      composeEndMessage,
+      composeSeanceResults,
       postTweet,
       recordThatReplyHappened
     ],
@@ -90,9 +88,10 @@ function findLastReplyDateForUser(tweet, done) {
 }
 
 function replyDateWasNotTooRecent(tweet, date, done) {
-  // Temporarily suspending limits.
   originatingTweet = tweet;
+  // Temporarily suspending limits.
   done();
+  return;
 
   if (typeof date !== 'object') {
     date = new Date(date);
@@ -109,24 +108,6 @@ function replyDateWasNotTooRecent(tweet, date, done) {
       Need at least ${behavior.hoursToWaitBetweenRepliesToSameUser} to pass.`
     ));
   }
-}
-
-function composeStartMessage(done) {
-   var startMessage = '@' + originatingTweet.user.screen_name + ' ' +
-    probable.pickFromArray(symbols.upSymbols) + ' ' +
-    'Door to spirit world open!' + ' ' +
-    probable.pickFromArray(symbols.upSymbols);
-
-  callNextTick(done, null, startMessage);
-}
-
-function composeEndMessage(done) {
-  var endMessage = '@' + originatingTweet.user.screen_name + ' ' +
-    probable.pickFromArray(symbols.downSymbols) + ' ' +
-    'Door to spirit world closed until tomorrow!' + ' ' +
-    probable.pickFromArray(symbols.downSymbols);
-
-  callNextTick(done, null, endMessage);
 }
 
 function postTweet(text, done) {
@@ -148,7 +129,7 @@ function postTweet(text, done) {
   }
 }
 
-function pickWord(data, response, done) {
+function pickWord(done) {
   // Placeholder.
   var word = originatingTweet.text.split(' ')[1];
   callNextTick(done, null, word);
@@ -157,12 +138,16 @@ function pickWord(data, response, done) {
 function runSeance(word, done) {
   var seanceOpts = {
     word: word,
-    direction: probable.roll(3) === 0 ? 'backward' : 'forward',
-    originatingTweet: originatingTweet,
-    twit: twit
+    direction: probable.roll(3) === 0 ? 'backward' : 'forward'
   };
 
   conductSeance(seanceOpts, done);
+}
+
+function composeSeanceResults(words, done) {
+   var message = '@' + originatingTweet.user.screen_name + ' ' +
+    words.join(' ');
+  callNextTick(done, null, message);
 }
 
 // TODO: All of these async tasks should have just (opts, done) params.
