@@ -90,6 +90,10 @@ function findLastReplyDateForUser(tweet, done) {
 }
 
 function replyDateWasNotTooRecent(tweet, date, done) {
+  // Temporarily suspending limits.
+  originatingTweet = tweet;
+  done();
+
   if (typeof date !== 'object') {
     date = new Date(date);
   }
