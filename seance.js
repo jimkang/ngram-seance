@@ -17,7 +17,7 @@ function conductSeance(opts, done) {
     originatingTweet = opts.originatingTweet;
     twit = opts.twit;
   }
-
+debugger;
   if (!direction) {
     direction = 'forward';
   }
@@ -57,8 +57,9 @@ function conductSeance(opts, done) {
   }
 
   function saveErrorAndStop(error) {
+    debugger;
     lastError = error;
-    wanderStream.end();
+    // wanderStream.end();
     writableTweetStream.end();
   }
 

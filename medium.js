@@ -10,12 +10,17 @@ var conductSeance = require('./seance');
 var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
 var symbols = require('./symbols');
+var createWordnok = require('wordnok').createWordnok;
 
 var seed = (new Date()).toISOString();
 console.log('seed:', seed);
 
 var probable = createProbable({
   random: seedrandom(seed)
+});
+
+var wordnok = createWordnok({
+  apiKey: config.wordnikAPIKey
 });
 
 var dryRun = false;
@@ -54,6 +59,7 @@ function respondToTweet(tweet) {
       replyDateWasNotTooRecent,
       composeStartMessage,
       postTweet,
+      pickWord,
       runSeance,
       composeEndMessage,
       postTweet,
@@ -138,9 +144,15 @@ function postTweet(text, done) {
   }
 }
 
-function runSeance(data, response, done) {
+function pickWord(data, response, done) {
+  // Placeholder.
+  var word = originatingTweet.text.split(' ')[1];
+  callNextTick(done, null, word);
+}
+
+function runSeance(word, done) {
   var seanceOpts = {
-    word: 'butts',
+    word: word,
     direction: probable.roll(3) === 0 ? 'backward' : 'forward',
     originatingTweet: originatingTweet,
     twit: twit
