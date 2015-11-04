@@ -1,7 +1,7 @@
 ngram-seance
 ==================
 
-Holds seances to communicate with the realm of Google N-grams
+Holds seances to communicate with the realm of Google N-grams.
 
 Installation
 ------------

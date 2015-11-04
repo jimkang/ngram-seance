@@ -12,15 +12,6 @@ stop-docker-machine:
 start-docker-machine:
 	docker-machine start dev
 
-create-docker-machine:
-	docker-machine create --driver virtualbox dev
-
-stop-docker-machine:
-	docker-machine stop dev
-
-start-docker-machine:
-	docker-machine start dev
-
 # connect-to-docker-machine:
 	# eval "$(docker-machine env dev)"
 

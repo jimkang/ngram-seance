@@ -6,6 +6,17 @@ var async = require('async');
 var createChronicler = require('basicset-chronicler').createChronicler;
 var behavior = require('./behavior');
 var emojisource = require('emojisource');
+var conductSeance = require('./seance');
+var seedrandom = require('seedrandom');
+var createProbable = require('probable').createProbable;
+var symbols = require('./symbols');
+
+var seed = (new Date()).toISOString();
+console.log('seed:', seed);
+
+var probable = createProbable({
+  random: seedrandom(seed)
+});
 
 var dryRun = false;
 if (process.argv.length > 2) {
@@ -13,6 +24,7 @@ if (process.argv.length > 2) {
 }
 
 var username = 'ngram_seance';
+var originatingTweet;
 
 var chronicler = createChronicler({
   dbLocation: __dirname + '/data/seance-chronicler.db'
@@ -27,7 +39,6 @@ var stream = twit.stream('user', streamOpts);
 stream.on('tweet', respondToTweet);
 
 function respondToTweet(tweet) {
-  debugger;
   if (tweet.user.screen_name === username) {
     return;
   }
@@ -41,7 +52,10 @@ function respondToTweet(tweet) {
     [
       goFindLastReplyDate,
       replyDateWasNotTooRecent,
-      composeReply,
+      composeStartMessage,
+      postTweet,
+      runSeance,
+      composeEndMessage,
       postTweet,
       recordThatReplyHappened
     ],
@@ -49,19 +63,16 @@ function respondToTweet(tweet) {
   );
 
   function goFindLastReplyDate(done) {
-    debugger;
     findLastReplyDateForUser(tweet, done);
   }
 }
 
 function findLastReplyDateForUser(tweet, done) {
-  debugger;
   chronicler.whenWasUserLastRepliedTo(
     tweet.user.id.toString(), passLastReplyDate
   );
 
   function passLastReplyDate(error, date) {
-    debugger;
     // Don't pass on the error – `whenWasUserLastRepliedTo` can't find a
     // key, it returns a NotFoundError. For us, that's expected.
     if (error && error.type === 'NotFoundError') {
@@ -73,14 +84,14 @@ function findLastReplyDateForUser(tweet, done) {
 }
 
 function replyDateWasNotTooRecent(tweet, date, done) {
-  debugger;
   if (typeof date !== 'object') {
     date = new Date(date);
   }
   var hoursElapsed = (Date.now() - date.getTime()) / (60 * 60 * 1000);
 
   if (hoursElapsed > behavior.hoursToWaitBetweenRepliesToSameUser) {
-    done(null, tweet);
+    originatingTweet = tweet;
+    done();
   }
   else {
     done(new Error(
@@ -90,10 +101,22 @@ function replyDateWasNotTooRecent(tweet, date, done) {
   }
 }
 
-function composeReply(tweet, done) {
-  var text = '@' + tweet.user.screen_name + ' I am replying! ' +
-    emojisource.getRandomTopicEmoji();
-  callNextTick(done, null, text);
+function composeStartMessage(done) {
+   var startMessage = '@' + originatingTweet.user.screen_name + ' ' +
+    probable.pickFromArray(symbols.upSymbols) + ' ' +
+    'Door to spirit world open!' + ' ' +
+    probable.pickFromArray(symbols.upSymbols);
+
+  callNextTick(done, null, startMessage);
+}
+
+function composeEndMessage(done) {
+  var endMessage = '@' + originatingTweet.user.screen_name + ' ' +
+    probable.pickFromArray(symbols.downSymbols) + ' ' +
+    'Door to spirit world closed until tomorrow!' + ' ' +
+    probable.pickFromArray(symbols.downSymbols);
+
+  callNextTick(done, null, endMessage);
 }
 
 function postTweet(text, done) {
@@ -108,18 +131,29 @@ function postTweet(text, done) {
   }
   else {
     var body = {
-      status: text
+      status: text,
+      in_reply_to_status_id: originatingTweet.id_str
     };
     twit.post('statuses/update', body, done);
   }
 }
 
-function recordThatReplyHappened(tweetData, response, done) {
-  debugger;
-  var userId = tweetData.user.id_str;
+function runSeance(data, response, done) {
+  var seanceOpts = {
+    word: 'butts',
+    direction: probable.roll(3) === 0 ? 'backward' : 'forward',
+    originatingTweet: originatingTweet,
+    twit: twit
+  };
+
+  conductSeance(seanceOpts, done);
+}
+
+// TODO: All of these async tasks should have just (opts, done) params.
+function recordThatReplyHappened(closingTweetData, response, done) {
   // TODO: recordThatUserWasRepliedTo should be async.
-  chronicler.recordThatUserWasRepliedTo(userId);
-  callNextTick(done, null, tweetData);
+  chronicler.recordThatUserWasRepliedTo(originatingTweet.user.id_str);
+  callNextTick(done);
 }
 
 function wrapUp(error, data) {
