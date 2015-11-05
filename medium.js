@@ -56,7 +56,7 @@ function respondToTweet(tweet) {
 
   var usernames = betterKnowATweet.whosInTheTweet(tweet);
   if (!usernames || usernames.indexOf(username) === -1 ||
-    isRetweetOfUser(username)) {
+    betterKnowATweet.isRetweetOfUser(username, tweet)) {
 
     return;
   }
