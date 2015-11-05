@@ -1,5 +1,5 @@
 var behavior = {
-  hoursToWaitBetweenRepliesToSameUser: 2  
+  hoursToWaitBetweenRepliesToSameUser: 0
 };
 
 module.exports = behavior;

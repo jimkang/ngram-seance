@@ -11,6 +11,8 @@ var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
 var symbols = require('./symbols');
 var createWordnok = require('wordnok').createWordnok;
+var getSeanceTopic = require('./get-seance-topic');
+var getFortune404Message = require('./get-fortune-404-message');
 
 var seed = (new Date()).toISOString();
 console.log('seed:', seed);
@@ -28,8 +30,9 @@ if (process.argv.length > 2) {
   dryRun = (process.argv[2].toLowerCase() == '--dry');
 }
 
-var username = 'ngram_seance';
+var username = 'cleromancer';
 var originatingTweet;
+var topicUsed;
 
 var chronicler = createChronicler({
   dbLocation: __dirname + '/data/seance-chronicler.db'
@@ -89,9 +92,6 @@ function findLastReplyDateForUser(tweet, done) {
 
 function replyDateWasNotTooRecent(tweet, date, done) {
   originatingTweet = tweet;
-  // Temporarily suspending limits.
-  done();
-  return;
 
   if (typeof date !== 'object') {
     date = new Date(date);
@@ -131,11 +131,18 @@ function postTweet(text, done) {
 
 function pickWord(done) {
   // Placeholder.
-  var word = originatingTweet.text.split(' ')[1];
-  callNextTick(done, null, word);
+  // var word = originatingTweet.text.split(' ')[1];
+  // callNextTick(done, null, word);
+  var topicOpts = {
+    wordnok: wordnok,
+    text: originatingTweet.text
+  };
+  getSeanceTopic(topicOpts, done);
 }
 
 function runSeance(word, done) {
+  topicUsed = word;
+
   var seanceOpts = {
     word: word,
     direction: probable.roll(3) === 0 ? 'backward' : 'forward'
@@ -145,8 +152,17 @@ function runSeance(word, done) {
 }
 
 function composeSeanceResults(words, done) {
-   var message = '@' + originatingTweet.user.screen_name + ' ' +
-    words.join(' ');
+  var message = '@' + originatingTweet.user.screen_name + ' ';
+
+  if (words.length < 2 && words[0] === topicUsed) {
+    message += getFortune404Message();
+  }
+  else {
+    message += words.join(' ');
+  }
+
+  message += (' ' + probable.pickFromArray(symbols.magickSymbols));
+
   callNextTick(done, null, message);
 }
 

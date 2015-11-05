@@ -1,7 +1,7 @@
 HOMEDIR = $(shell pwd)
 
 test:
-	node tests/basictests.js
+	node tests/get-seance-topic-tests.js
 
 start-medium:
 	node medium.js
