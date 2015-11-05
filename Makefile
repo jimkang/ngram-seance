@@ -9,6 +9,9 @@ start-medium:
 followback:
 	node followback.js
 
+tweet-unprompted:
+	node tweet-seance.js
+
 stop-docker-machine:
 	docker-machine stop dev
 
@@ -31,6 +34,10 @@ run-docker-image:
 run-docker-followback:
 	docker run -v $(HOMEDIR)/config:/usr/src/app/config \
 		jkang/ngram-seance make followback
+
+run-docker-tweet-unprompted:
+	docker run -v $(HOMEDIR)/config:/usr/src/app/config \
+		jkang/ngram-seance make tweet-unprompted
 
 pushall: push-docker-image
 	git push origin master

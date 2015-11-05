@@ -5,20 +5,23 @@ var betterKnowATweet = require('better-know-a-tweet');
 var async = require('async');
 var createChronicler = require('basicset-chronicler').createChronicler;
 var behavior = require('./behavior');
-var emojisource = require('emojisource');
 var conductSeance = require('./seance');
 var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
-var symbols = require('./symbols');
 var createWordnok = require('wordnok').createWordnok;
 var getSeanceTopic = require('./get-seance-topic');
-var getFortune404Message = require('./get-fortune-404-message');
+var createComposeMessage = require('./compose-message');
 
 var seed = (new Date()).toISOString();
 console.log('seed:', seed);
+var random = seedrandom(seed);
 
 var probable = createProbable({
-  random: seedrandom(seed)
+  random: random
+});
+
+var composeMessage = createComposeMessage({
+  random: random
 });
 
 var wordnok = createWordnok({
@@ -52,7 +55,9 @@ function respondToTweet(tweet) {
   }
 
   var usernames = betterKnowATweet.whosInTheTweet(tweet);
-  if (!usernames || usernames.indexOf(username) === -1) {
+  if (!usernames || usernames.indexOf(username) === -1 ||
+    isRetweetOfUser(username)) {
+
     return;
   }
 
@@ -62,7 +67,7 @@ function respondToTweet(tweet) {
       replyDateWasNotTooRecent,
       pickWord,
       runSeance,
-      composeSeanceResults,
+      composeMessage,
       postTweet,
       recordThatReplyHappened
     ],
@@ -111,6 +116,8 @@ function replyDateWasNotTooRecent(tweet, date, done) {
 }
 
 function postTweet(text, done) {
+  text = '@' + originatingTweet.user.screen_name + ' ' + text;
+
   if (dryRun) {
     console.log('Would have tweeted:', text);
     var mockTweetData = {
@@ -130,9 +137,6 @@ function postTweet(text, done) {
 }
 
 function pickWord(done) {
-  // Placeholder.
-  // var word = originatingTweet.text.split(' ')[1];
-  // callNextTick(done, null, word);
   var topicOpts = {
     wordnok: wordnok,
     text: originatingTweet.text
@@ -149,21 +153,6 @@ function runSeance(word, done) {
   };
 
   conductSeance(seanceOpts, done);
-}
-
-function composeSeanceResults(words, done) {
-  var message = '@' + originatingTweet.user.screen_name + ' ';
-
-  if (words.length < 2 && words[0] === topicUsed) {
-    message += getFortune404Message();
-  }
-  else {
-    message += words.join(' ');
-  }
-
-  message += (' ' + probable.pickFromArray(symbols.magickSymbols));
-
-  callNextTick(done, null, message);
 }
 
 // TODO: All of these async tasks should have just (opts, done) params.
