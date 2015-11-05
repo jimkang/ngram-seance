@@ -6,6 +6,9 @@ test:
 start-medium:
 	node medium.js
 
+followback:
+	node followback.js
+
 stop-docker-machine:
 	docker-machine stop dev
 
@@ -24,6 +27,10 @@ push-docker-image: build-docker-image
 run-docker-image:
 	docker run -v $(HOMEDIR)/config:/usr/src/app/config \
 		jkang/ngram-seance
+
+run-docker-followback:
+	docker run -v $(HOMEDIR)/config:/usr/src/app/config \
+		jkang/ngram-seance make followback
 
 pushall: push-docker-image
 	git push origin master
