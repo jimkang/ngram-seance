@@ -8,16 +8,22 @@ function conductSeance(opts, done) {
   var direction;
 
   if (opts) {
-    word = opts.word,
+    word = opts.word;
     direction = opts.direction;
   }
 
   if (!direction) {
     direction = 'forward';
   }
+
   var words = [];
 
-  var wanderStream = createWanderStream(_.pick(opts, 'word', 'direction'));
+  var wanderStream = createWanderStream({
+    word: word,
+    direction: direction,
+    repeatLimit: 2,
+    tryReducingNgramSizeAtDeadEnds: true
+  });
 
   wanderStream.on('error', saveErrorAndStop);
   wanderStream.on('data', saveWord);
