@@ -1,16 +1,15 @@
 var config = require('./config/config');
 var callNextTick = require('call-next-tick');
 var Twit = require('twit');
-var betterKnowATweet = require('better-know-a-tweet');
 var async = require('async');
 var createChronicler = require('basicset-chronicler').createChronicler;
-var behavior = require('./behavior');
 var conductSeance = require('./seance');
 var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
 var createWordnok = require('wordnok').createWordnok;
 var getSeanceTopic = require('./get-seance-topic');
 var createComposeMessage = require('./compose-message');
+var shouldReplyToTweet = require('./should-reply-to-tweet');
 
 var seed = (new Date()).toISOString();
 console.log('seed:', seed);
@@ -33,9 +32,7 @@ if (process.argv.length > 2) {
   dryRun = (process.argv[2].toLowerCase() == '--dry');
 }
 
-var username = 'cleromancer';
 var originatingTweet;
-var topicUsed;
 
 var chronicler = createChronicler({
   dbLocation: __dirname + '/data/seance-chronicler.db'
@@ -50,21 +47,11 @@ var stream = twit.stream('user', streamOpts);
 stream.on('tweet', respondToTweet);
 
 function respondToTweet(tweet) {
-  if (tweet.user.screen_name === username) {
-    return;
-  }
-
-  var usernames = betterKnowATweet.whosInTheTweet(tweet);
-  if (!usernames || usernames.indexOf(username) === -1 ||
-    betterKnowATweet.isRetweetOfUser(username, tweet)) {
-
-    return;
-  }
+  originatingTweet = tweet;
 
   async.waterfall(
     [
-      goFindLastReplyDate,
-      replyDateWasNotTooRecent,
+      checkIfWeShouldReply,
       pickWord,
       runSeance,
       composeMessage,
@@ -74,44 +61,12 @@ function respondToTweet(tweet) {
     wrapUp
   );
 
-  function goFindLastReplyDate(done) {
-    findLastReplyDateForUser(tweet, done);
-  }
-}
-
-function findLastReplyDateForUser(tweet, done) {
-  chronicler.whenWasUserLastRepliedTo(
-    tweet.user.id.toString(), passLastReplyDate
-  );
-
-  function passLastReplyDate(error, date) {
-    // Don't pass on the error – `whenWasUserLastRepliedTo` can't find a
-    // key, it returns a NotFoundError. For us, that's expected.
-    if (error && error.type === 'NotFoundError') {
-      error = null;
-      date = new Date(0);
-    }
-    done(error, tweet, date);
-  }
-}
-
-function replyDateWasNotTooRecent(tweet, date, done) {
-  originatingTweet = tweet;
-
-  if (typeof date !== 'object') {
-    date = new Date(date);
-  }
-  var hoursElapsed = (Date.now() - date.getTime()) / (60 * 60 * 1000);
-
-  if (hoursElapsed > behavior.hoursToWaitBetweenRepliesToSameUser) {
-    originatingTweet = tweet;
-    done();
-  }
-  else {
-    done(new Error(
-      `Replied ${hoursElapsed} hours ago to ${tweet.user.screen_name}.
-      Need at least ${behavior.hoursToWaitBetweenRepliesToSameUser} to pass.`
-    ));
+  function checkIfWeShouldReply(done) {
+    var opts = {
+      tweet: tweet,
+      chronicler: chronicler
+    };
+    shouldReplyToTweet(opts, done);
   }
 }
 
@@ -145,8 +100,6 @@ function pickWord(done) {
 }
 
 function runSeance(word, done) {
-  topicUsed = word;
-
   var seanceOpts = {
     word: word,
     direction: probable.roll(3) === 0 ? 'backward' : 'forward'
