@@ -10,6 +10,7 @@ var username = 'cleromancer';
 function shouldReplyToTweet(opts, done) {
   var tweet;
   var chronicler;
+  var waitingPeriod = behavior.hoursToWaitBetweenRepliesToSameUser;
 
   if (opts) {
     tweet = opts.tweet;
@@ -21,15 +22,21 @@ function shouldReplyToTweet(opts, done) {
     return;
   }
 
-  var usernames = betterKnowATweet.whosInTheTweet(tweet);
-  if (!usernames || usernames.indexOf(username) === -1) {
-    callNextTick(done, new Error('Bot\'s username is not mentioned.'));
-    return;
-  }
-
   if (betterKnowATweet.isRetweetOfUser(username, tweet)) {
     callNextTick(done, new Error('Subject tweet is own retweet.'));
     return;
+  }
+
+  if (behavior.chimeInUsers.indexOf(tweet.user.screen_name) === -1) {
+    var usernames = betterKnowATweet.whosInTheTweet(tweet);
+
+    if (!usernames || usernames.indexOf(username) === -1) {
+      callNextTick(done, new Error('Bot\'s username is not mentioned.'));
+      return;
+    }
+  }
+  else {
+    waitingPeriod = behavior.hoursToWaitBetweenChimeIns;
   }
 
   async.waterfall(
@@ -59,22 +66,22 @@ function shouldReplyToTweet(opts, done) {
       done(error, tweet, date);
     }
   }
-}
 
-function replyDateWasNotTooRecent(tweet, date, done) {
-  if (typeof date !== 'object') {
-    date = new Date(date);
-  }
-  var hoursElapsed = (Date.now() - date.getTime()) / (60 * 60 * 1000);
+  function replyDateWasNotTooRecent(tweet, date, done) {
+    if (typeof date !== 'object') {
+      date = new Date(date);
+    }
+    var hoursElapsed = (Date.now() - date.getTime()) / (60 * 60 * 1000);
 
-  if (hoursElapsed > behavior.hoursToWaitBetweenRepliesToSameUser) {
-    done();
-  }
-  else {
-    done(new Error(
-      `Replied ${hoursElapsed} hours ago to ${tweet.user.screen_name}.
-      Need at least ${behavior.hoursToWaitBetweenRepliesToSameUser} to pass.`
-    ));
+    if (hoursElapsed > waitingPeriod) {
+      done();
+    }
+    else {
+      done(new Error(
+        `Replied ${hoursElapsed} hours ago to ${tweet.user.screen_name}.
+        Need at least ${waitingPeriod} to pass.`
+      ));
+    }
   }
 }
 
