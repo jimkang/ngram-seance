@@ -6,10 +6,12 @@ var emojisource = require('emojisource');
 function conductSeance(opts, done) {
   var word;
   var direction;
+  var characterLimit;
 
   if (opts) {
     word = opts.word;
     direction = opts.direction;
+    characterLimit = opts.characterLimit;
   }
 
   if (!direction) {
@@ -21,7 +23,7 @@ function conductSeance(opts, done) {
   var wanderStream = createWanderStream({
     word: word,
     direction: direction,
-    repeatLimit: 2,
+    repeatLimit: 1,
     tryReducingNgramSizeAtDeadEnds: true
   });
 
@@ -30,7 +32,18 @@ function conductSeance(opts, done) {
   wanderStream.on('end', passBackWords);
 
   function saveWord(word) {
-    words.push(word);
+    if (characterLimit === undefined) {
+      words.push(word);
+    }
+    else {
+      if (words.join(' ').length + word.length + 1 <= characterLimit) {
+        words.push(word);
+      }
+      else {
+        console.log('hit char limit with word', word);
+        wanderStream.end();
+      }
+    }
   }
 
   function saveErrorAndStop(error) {

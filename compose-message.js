@@ -18,7 +18,7 @@ function createComposeMessage(opts) {
     // var message = '@' + originatingTweet.user.screen_name + ' ';
     var message;
 
-    if (words.length < 2 && words[0] === topicUsed) {
+    if (words.length < 2) {
       message = getFortune404Message();
     }
     else {

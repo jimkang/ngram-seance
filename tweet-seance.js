@@ -66,7 +66,8 @@ function pickFirst(words, done) {
 function runSeance(topic, done) {
   var seanceOpts = {
     word: topic,
-    direction: probable.roll(3) === 0 ? 'backward' : 'forward'
+    direction: probable.roll(3) === 0 ? 'backward' : 'forward',
+    characterLimit: 140
   };
 
   conductSeance(seanceOpts, done);
