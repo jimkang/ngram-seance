@@ -4,7 +4,13 @@ var config = require('./config/config.js');
 filteredFollowback(
   {
     twitterCreds: config.twitter,
-    neverUnfollow: []
+    neverUnfollow: [
+      3247937115,
+      3158440414,
+      3257074863,
+      2882218444,
+      3755520987
+    ]
   },
   reportResults
 );
