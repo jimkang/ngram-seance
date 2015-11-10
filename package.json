@@ -32,7 +32,7 @@
     "probable": "^1.7.0",
     "seedrandom": "^2.4.2",
     "twit": "^1.1.20",
-    "wander-google-ngrams": "^2.0.1",
+    "wander-google-ngrams": "^2.1.0",
     "wordnok": "https://github.com/jimkang/wordnok.git#no-cache"
   }
 }

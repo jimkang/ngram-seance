@@ -24,7 +24,9 @@ function conductSeance(opts, done) {
     word: word,
     direction: direction,
     repeatLimit: 1,
-    tryReducingNgramSizeAtDeadEnds: true
+    tryReducingNgramSizeAtDeadEnds: true,
+    shootForASentence: true,
+    maxWordCount: 25
   });
 
   wanderStream.on('error', saveErrorAndStop);
