@@ -68,7 +68,7 @@ function runSeance(topic, done) {
     word: topic,
     direction: probable.roll(3) === 0 ? 'backward' : 'forward',
     characterLimit: 120,
-    maxWordCount: 20
+    maxWordCount: 16
   };
 
   conductSeance(seanceOpts, done);
@@ -76,7 +76,7 @@ function runSeance(topic, done) {
 
 function postTweet(text, done) {
   text = getGateOpenMessage() + text;
-  text = text.slice(0, 141);
+  text = text.slice(0, 140);
 
   if (dryRun) {
     console.log('Would have tweeted:', text);
