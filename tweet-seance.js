@@ -7,7 +7,7 @@ var seedrandom = require('seedrandom');
 var createComposeMessage = require('./compose-message');
 var createWordnok = require('wordnok').createWordnok;
 var createProbable = require('probable').createProbable;
-
+var getGateOpenMessage = require('./get-gate-open-message');
 
 var dryRun = false;
 if (process.argv.length > 2) {
@@ -68,14 +68,15 @@ function runSeance(topic, done) {
     word: topic,
     direction: probable.roll(3) === 0 ? 'backward' : 'forward',
     characterLimit: 120,
-    maxWordCount: 25
+    maxWordCount: 20
   };
 
   conductSeance(seanceOpts, done);
 }
 
 function postTweet(text, done) {
-  // TODO: Some sort of message preface.
+  text = getGateOpenMessage() + text;
+  text = text.slice(0, 141);
 
   if (dryRun) {
     console.log('Would have tweeted:', text);
