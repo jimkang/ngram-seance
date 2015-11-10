@@ -7,11 +7,13 @@ function conductSeance(opts, done) {
   var word;
   var direction;
   var characterLimit;
+  var maxWordCount;
 
   if (opts) {
     word = opts.word;
     direction = opts.direction;
     characterLimit = opts.characterLimit;
+    maxWordCount = opts.maxWordCount
   }
 
   if (!direction) {
@@ -26,7 +28,7 @@ function conductSeance(opts, done) {
     repeatLimit: 1,
     tryReducingNgramSizeAtDeadEnds: true,
     shootForASentence: true,
-    maxWordCount: 25
+    maxWordCount: maxWordCount
   });
 
   wanderStream.on('error', saveErrorAndStop);

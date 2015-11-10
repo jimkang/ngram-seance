@@ -102,7 +102,8 @@ function pickWord(done) {
 function runSeance(word, done) {
   var seanceOpts = {
     word: word,
-    direction: probable.roll(3) === 0 ? 'backward' : 'forward'
+    direction: probable.roll(4) === 0 ? 'backward' : 'forward',
+    maxWordCount: 20
   };
 
   conductSeance(seanceOpts, done);

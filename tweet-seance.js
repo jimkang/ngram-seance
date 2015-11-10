@@ -67,7 +67,8 @@ function runSeance(topic, done) {
   var seanceOpts = {
     word: topic,
     direction: probable.roll(3) === 0 ? 'backward' : 'forward',
-    characterLimit: 140
+    characterLimit: 120,
+    maxWordCount: 25
   };
 
   conductSeance(seanceOpts, done);
