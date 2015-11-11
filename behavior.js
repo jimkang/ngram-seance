@@ -1,5 +1,5 @@
 var behavior = {
-  hoursToWaitBetweenRepliesToSameUser: 0,
+  hoursToWaitBetweenRepliesToSameUser: 2,
   hoursToWaitBetweenChimeIns: 4,
   chimeInUsers: [
     'deathmtn',
@@ -13,7 +13,8 @@ var behavior = {
     'translatedbible',
     'godtributes',
     'deathmtn_eboox',
-    'wikisext'
+    'wikisext',
+    'wrdsaladshootr'
   ]
 };
 
