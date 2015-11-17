@@ -32,8 +32,6 @@ if (process.argv.length > 2) {
   dryRun = (process.argv[2].toLowerCase() == '--dry');
 }
 
-var originatingTweet;
-
 var chronicler = createChronicler({
   dbLocation: __dirname + '/data/seance-chronicler.db'
 });
@@ -47,8 +45,6 @@ var stream = twit.stream('user', streamOpts);
 stream.on('tweet', respondToTweet);
 
 function respondToTweet(tweet) {
-  originatingTweet = tweet;
-
   async.waterfall(
     [
       checkIfWeShouldReply,
@@ -68,52 +64,52 @@ function respondToTweet(tweet) {
     };
     shouldReplyToTweet(opts, done);
   }
-}
 
-function postTweet(text, done) {
-  text = '@' + originatingTweet.user.screen_name + ' ' + text;
-
-  if (dryRun) {
-    console.log('Would have tweeted:', text);
-    var mockTweetData = {
-      user: {
-        id_str: 'mockuser',        
-      }
+  function pickWord(done) {
+    var topicOpts = {
+      wordnok: wordnok,
+      text: tweet.text
     };
-    callNextTick(done, null, mockTweetData);
+    getSeanceTopic(topicOpts, done);
   }
-  else {
-    var body = {
-      status: text,
-      in_reply_to_status_id: originatingTweet.id_str
+
+  function runSeance(word, done) {
+    var seanceOpts = {
+      word: word,
+      direction: probable.roll(4) === 0 ? 'backward' : 'forward',
+      maxWordCount: 20
     };
-    twit.post('statuses/update', body, done);
+
+    conductSeance(seanceOpts, done);
   }
-}
 
-function pickWord(done) {
-  var topicOpts = {
-    wordnok: wordnok,
-    text: originatingTweet.text
-  };
-  getSeanceTopic(topicOpts, done);
-}
+  function postTweet(text, done) {
+    text = '@' + tweet.user.screen_name + ' ' + text;
 
-function runSeance(word, done) {
-  var seanceOpts = {
-    word: word,
-    direction: probable.roll(4) === 0 ? 'backward' : 'forward',
-    maxWordCount: 20
-  };
+    if (dryRun) {
+      console.log('Would have tweeted:', text);
+      var mockTweetData = {
+        user: {
+          id_str: 'mockuser',        
+        }
+      };
+      callNextTick(done, null, mockTweetData);
+    }
+    else {
+      var body = {
+        status: text,
+        in_reply_to_status_id: tweet.id_str
+      };
+      twit.post('statuses/update', body, done);
+    }
+    }
 
-  conductSeance(seanceOpts, done);
-}
-
-// TODO: All of these async tasks should have just (opts, done) params.
-function recordThatReplyHappened(closingTweetData, response, done) {
-  // TODO: recordThatUserWasRepliedTo should be async.
-  chronicler.recordThatUserWasRepliedTo(originatingTweet.user.id_str);
-  callNextTick(done);
+  // TODO: All of these async tasks should have just (opts, done) params.
+  function recordThatReplyHappened(closingTweetData, response, done) {
+    // TODO: recordThatUserWasRepliedTo should be async.
+    chronicler.recordThatUserWasRepliedTo(tweet.user.id_str);
+    callNextTick(done);
+  }
 }
 
 function wrapUp(error, data) {
