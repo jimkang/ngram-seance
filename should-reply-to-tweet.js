@@ -10,7 +10,7 @@ var username = 'cleromancer';
 function shouldReplyToTweet(opts, done) {
   var tweet;
   var chronicler;
-  var waitingPeriod = behavior.hoursToWaitBetweenRepliesToSameUser;
+  var waitingPeriod;
 
   if (opts) {
     tweet = opts.tweet;
@@ -27,16 +27,21 @@ function shouldReplyToTweet(opts, done) {
     return;
   }
 
-  if (behavior.chimeInUsers.indexOf(tweet.user.screen_name) === -1) {
-    var usernames = betterKnowATweet.whosInTheTweet(tweet);
+  var tweetMentionsBot = doesTweetMentionBot(tweet);
 
-    if (!usernames || usernames.indexOf(username) === -1) {
-      callNextTick(done, new Error('Bot\'s username is not mentioned.'));
-      return;
-    }
+  if (behavior.chimeInUsers.indexOf(tweet.user.screen_name) !== -1 &&
+    !tweetMentionsBot) {
+
+    // Chiming in.
+    waitingPeriod = behavior.hoursToWaitBetweenChimeIns;
+  }
+  else if (tweetMentionsBot) {
+    // Replying.
+    waitingPeriod = behavior.hoursToWaitBetweenRepliesToSameUser;
   }
   else {
-    waitingPeriod = behavior.hoursToWaitBetweenChimeIns;
+    callNextTick(done, new Error('Not chiming in or replying.'));
+    return;
   }
 
   async.waterfall(
@@ -83,6 +88,11 @@ function shouldReplyToTweet(opts, done) {
       ));
     }
   }
+}
+
+function doesTweetMentionBot(tweet) {
+  var usernames = betterKnowATweet.whosInTheTweet(tweet);
+  return usernames && usernames.indexOf(username) !== -1;
 }
 
 module.exports = shouldReplyToTweet;
