@@ -76,7 +76,7 @@ function respondToTweet(tweet) {
   function runSeance(word, done) {
     var seanceOpts = {
       word: word,
-      direction: probable.roll(4) === 0 ? 'backward' : 'forward',
+      direction: 'forward',
       maxWordCount: 20
     };
 
