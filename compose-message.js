@@ -2,6 +2,7 @@ var symbols = require('./symbols');
 var getFortune404Message = require('./get-fortune-404-message');
 var callNextTick = require('call-next-tick');
 var createProbable = require('probable').createProbable;
+var ngramChainToSentence = require('ngram-chain-to-sentence');
 
 function createComposeMessage(opts) {
   var random;
@@ -22,10 +23,10 @@ function createComposeMessage(opts) {
       message = getFortune404Message();
     }
     else {
-      message = words.join(' ');
+      message = ngramChainToSentence(words);
     }
 
-    message += (' ' + probable.pickFromArray(symbols.magickSymbols));
+    // message += (' ' + probable.pickFromArray(symbols.magickSymbols));
 
     callNextTick(done, null, message);
   }

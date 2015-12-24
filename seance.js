@@ -1,7 +1,10 @@
 var WanderGoogleNgrams = require('wander-google-ngrams');
-var createWanderStream = WanderGoogleNgrams();
 var _ = require('lodash');
-var emojisource = require('emojisource');
+var config = require('./config/config');
+
+var createWanderStream = WanderGoogleNgrams({
+  wordnikAPIKey: config.wordnikAPIKey  
+});
 
 function conductSeance(opts, done) {
   var word;
