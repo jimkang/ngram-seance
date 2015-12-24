@@ -46,7 +46,7 @@ var stream = twit.stream('user', streamOpts);
 
 stream.on('tweet', queueResponseToTweet);
 
-setInterval(pullFromResponseQueue, 5 * 1000);
+setInterval(pullFromResponseQueue, 15 * 1000);
 
 function queueResponseToTweet(tweet) {
   // console.log('queuing.');
