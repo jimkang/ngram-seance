@@ -1,7 +1,8 @@
 var behavior = {
-  hoursToWaitBetweenRepliesToSameUser: 1,
+  hoursToWaitBetweenRepliesToSameUser: 0,
   hoursToWaitBetweenChimeIns: 4,
   chimeInUsers: [
+    'deathmtn'
   ]
 };
 

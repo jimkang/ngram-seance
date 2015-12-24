@@ -15,6 +15,8 @@ var seed = (new Date()).toISOString();
 console.log('seed:', seed);
 var random = seedrandom(seed);
 
+var responseQueue = [];
+
 var probable = createProbable({
   random: random
 });
@@ -42,7 +44,21 @@ var streamOpts = {
 };
 var stream = twit.stream('user', streamOpts);
 
-stream.on('tweet', respondToTweet);
+stream.on('tweet', queueResponseToTweet);
+
+setInterval(pullFromResponseQueue, 5 * 1000);
+
+function queueResponseToTweet(tweet) {
+  // console.log('queuing.');
+  responseQueue.unshift(tweet);
+}
+
+function pullFromResponseQueue() {
+  if (responseQueue.length > 0) {
+    // console.log('pulling from queue.');
+    callNextTick(respondToTweet, responseQueue.pop());
+  }
+}
 
 function respondToTweet(tweet) {
   async.waterfall(
