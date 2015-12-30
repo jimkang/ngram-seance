@@ -3,6 +3,15 @@ var getFortune404Message = require('./get-fortune-404-message');
 var callNextTick = require('call-next-tick');
 var createProbable = require('probable').createProbable;
 var ngramChainToSentence = require('ngram-chain-to-sentence');
+var probable = require('probable');
+
+var punctuationTable = probable.createTableFromDef({
+  '0-11': '.',
+  '12': '…',
+  '13-16': '!',
+  '17-18': '?',
+  '19': '?!'
+});
 
 function createComposeMessage(opts) {
   var random;
@@ -26,7 +35,7 @@ function createComposeMessage(opts) {
       message = ngramChainToSentence(words);
     }
 
-    // message += (' ' + probable.pickFromArray(symbols.magickSymbols));
+    message += punctuationTable.roll();
 
     callNextTick(done, null, message);
   }
