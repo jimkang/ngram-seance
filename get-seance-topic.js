@@ -1,6 +1,7 @@
 var createIsCool = require('iscool');
 var _ = require('lodash');
 var callNextTick = require('call-next-tick');
+var probable = require('probable');
 
 var iscool = createIsCool();
 
@@ -22,6 +23,11 @@ function getSeanceTopic(opts, done) {
 
   if (words.length === 1) {
     callNextTick(done, null, words[0]);
+    return;
+  }
+
+  if (probable.roll(3) === 0) {
+    callNextTick(done, null, probable.pickFromArray(words));
     return;
   }
 
