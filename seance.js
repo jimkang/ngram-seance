@@ -31,7 +31,29 @@ function conductSeance(opts, done) {
     repeatLimit: 1,
     tryReducingNgramSizeAtDeadEnds: true,
     shootForASentence: true,
-    maxWordCount: maxWordCount
+    maxWordCount: maxWordCount,
+    forwardStages: [
+      {
+        name: 'start',
+        needToProceed: ['noun', 'pronoun', 'noun-plural'],
+        lookFor: '*_NOUN'
+      },
+      {
+        name: 'pushedSubject',
+        needToProceed: ['verb', 'verb-intransitive', 'auxiliary-verb'],
+        lookFor: '*_VERB'
+      },
+      {
+        name: 'pushedVerb',
+        needToProceed: ['noun', 'pronoun', 'noun-plural', 'adjective'],
+        disallowCommonBadExits: true,
+        lookFor: '*_NOUN',
+        posShouldBeUnambiguous: true
+      },
+      {
+        name: 'done' // 'pushedObject'
+      }
+    ]
   });
 
   wanderStream.on('error', saveErrorAndStop);
