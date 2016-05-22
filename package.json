@@ -21,18 +21,18 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "async": "^0.9.0",
-    "basicset-chronicler": "^1.3.1",
+    "async": "^1.5.2",
+    "basicset-chronicler": "^2.0.0",
     "better-know-a-tweet": "^1.0.2",
     "call-next-tick": "^1.1.2",
-    "filtered-followback": "^1.2.0",
-    "iscool": "^1.1.17",
+    "filtered-followback": "^1.3.4",
+    "iscool": "^1.1.18",
     "lodash": "^3.10.1",
     "ngram-chain-to-sentence": "^1.0.0",
     "probable": "^1.7.0",
     "seedrandom": "^2.4.2",
-    "twit": "^1.1.20",
+    "twit": "^2.2.4",
     "wander-google-ngrams": "^2.5.1",
-    "wordnok": "^3.1.0"
+    "wordnok": "^3.2.0"
   }
 }
