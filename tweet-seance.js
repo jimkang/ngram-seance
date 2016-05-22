@@ -8,6 +8,7 @@ var createComposeMessage = require('./compose-message');
 var createWordnok = require('wordnok').createWordnok;
 var createProbable = require('probable').createProbable;
 var getGateOpenMessage = require('./get-gate-open-message');
+var getDotChain = require('./get-dot-chain');
 
 var dryRun = false;
 if (process.argv.length > 2) {
@@ -33,16 +34,21 @@ var wordnok = createWordnok({
 
 var twit = new Twit(config.twitter);
 
-async.waterfall(
-  [
-    getTopics,
-    pickFirst,
-    runSeance,
-    composeMessage,
-    postTweet,
-  ],
-  wrapUp
-);
+if (probable.roll(7) === 0) {
+  postTweet(getDotChain(probable.roll(100)), wrapUp);
+}
+else {
+  async.waterfall(
+    [
+      getTopics,
+      pickFirst,
+      runSeance,
+      composeMessage,
+      postTweet,
+    ],
+    wrapUp
+  );
+}
 
 function getTopics(done) {
   var opts = {
@@ -75,7 +81,15 @@ function runSeance(topic, done) {
 }
 
 function postTweet(text, done) {
-  text = getGateOpenMessage() + text;
+  var preface;
+  if (probable.roll(3) === 0) {
+    preface = getDotChain(3 + probable.roll(20));
+  }
+  else {
+    preface = getGateOpenMessage();
+  }
+
+  text = preface + text;
   text = text.slice(0, 140);
 
   if (dryRun) {
