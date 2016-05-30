@@ -1,17 +1,18 @@
-HOMEDIR = $(shell pwd)
-SMUSER = noderunner
-PRIVUSER = root
-SERVER = sprigot-droplet
-SSHCMD = ssh $(SMUSER)@$(SERVER)
 PROJECTNAME = ngram-seance
-APPDIR = /var/www/$(PROJECTNAME)
+HOMEDIR = $(shell pwd)
+USER = bot
+PRIVUSER = root
+SERVER = smidgeo
+SSHCMD = ssh $(USER)@$(SERVER)
+PRIVSSHCMD = ssh $(PRIVUSER)@$(SERVER)
+APPDIR = /opt/$(PROJECTNAME)
 
-pushall: sync  set-permissions restart-remote
+pushall: sync set-permissions restart-remote
 	git push origin master
 
 sync:
-	rsync -a $(HOMEDIR) $(SMUSER)@$(SERVER):/var/www/ --exclude node_modules/ --exclude data/
-	ssh $(SMUSER)@$(SERVER) "cd /var/www/$(PROJECTNAME) && npm install"
+	rsync -a $(HOMEDIR) $(USER)@$(SERVER):/opt/ --exclude node_modules/ --exclude data/
+	$(SSHCMD) "cd $(APPDIR) && npm install"
 
 set-permissions:
 	$(SSHCMD) "chmod +x $(APPDIR)/medium.js && \
@@ -19,14 +20,18 @@ set-permissions:
 
 update-remote: sync set-permissions restart-remote
 
-# You need a user with privileges to write to /etc/systemd and to run systemctl for 
-# these targets.
 restart-remote:
-	ssh $(PRIVUSER)@$(SERVER) "service $(PROJECTNAME) restart"
+	$(PRIVSSHCMD) "service $(PROJECTNAME) restart"
 
 install-service:
-	ssh $(PRIVUSER)@$(SERVER) "cp $(APPDIR)/$(PROJECTNAME).service /etc/systemd/system && \
+	$(PRIVSSHCMD) "cp $(APPDIR)/$(PROJECTNAME).service /etc/systemd/system && \
 	systemctl enable $(PROJECTNAME)"
+
+check-status:
+	$(SSHCMD) "systemctl status $(PROJECTNAME)"
+
+make-data-dir:
+	$(SSHCMD) "mkdir -p $(APPDIR)/data"
 
 test:
 	node tests/get-seance-topic-tests.js

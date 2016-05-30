@@ -1,0 +1,14 @@
+[Unit]
+Description=ngram-seance
+After=network.target
+
+[Service]
+ExecStart=/opt/ngram-seance/medium.js
+Restart=always
+User=bot
+Group=robots
+Environment=PATH=/usr/bin:/usr/local/bin
+WorkingDirectory=/opt/ngram-seance
+
+[Install]
+WantedBy=multi-user.target
