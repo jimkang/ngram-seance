@@ -6,7 +6,7 @@ After=network.target
 ExecStart=/opt/ngram-seance/medium.js
 Restart=always
 User=bot
-Group=robots
+Group=bot
 Environment=PATH=/usr/bin:/usr/local/bin
 WorkingDirectory=/opt/ngram-seance
 

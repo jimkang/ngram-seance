@@ -15,8 +15,7 @@ sync:
 	$(SSHCMD) "cd $(APPDIR) && npm install"
 
 set-permissions:
-	$(SSHCMD) "chmod +x $(APPDIR)/medium.js && \
-	chmod 777 -R $(APPDIR)/data/seance-chronicler.db"
+	$(SSHCMD) "chmod +x $(APPDIR)/medium.js"
 
 update-remote: sync set-permissions restart-remote
 
@@ -29,6 +28,9 @@ install-service:
 
 check-status:
 	$(SSHCMD) "systemctl status $(PROJECTNAME)"
+
+check-log:
+	$(SSHCMD) "journalctl -u $(PROJECTNAME)"
 
 make-data-dir:
 	$(SSHCMD) "mkdir -p $(APPDIR)/data"
