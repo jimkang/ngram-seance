@@ -2,7 +2,12 @@ var behavior = {
   hoursToWaitBetweenRepliesToSameUser: 0,
   hoursToWaitBetweenChimeIns: 4,
   chimeInUsers: [
-    'deathmtn'
+    'deathmtn',
+    'paparatti',
+    '15c3po',
+    'grobstein',
+    'tempest67',
+    'godtributes'
   ]
 };
 
