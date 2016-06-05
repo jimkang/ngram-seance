@@ -7,7 +7,8 @@ var behavior = {
     '15c3po',
     'grobstein',
     'tempest67',
-    'godtributes'
+    'godtributes',
+    'desjardins'
   ]
 };
 
