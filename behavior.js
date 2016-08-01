@@ -1,6 +1,6 @@
 var behavior = {
-  hoursToWaitBetweenRepliesToSameUser: 0,
-  hoursToWaitBetweenChimeIns: 4,
+  hoursToWaitBetweenRepliesToSameUser: 5,
+  hoursToWaitBetweenChimeIns: 24,
   chimeInUsers: [
     'deathmtn',
     'paparatti',
