@@ -29,7 +29,8 @@ function createComposeMessage(opts) {
     var message;
 
     if (words.length < 2) {
-      message = getFortune404Message();
+      callNextTick(done, new Error('Could not get long enough message.'));
+      return;
     }
     else {
       message = ngramChainToSentence(words);

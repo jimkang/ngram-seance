@@ -8,7 +8,8 @@ var behavior = {
     'grobstein',
     'tempest67',
     'godtributes',
-    'desjardins'
+    'desjardins',
+    'poptivist'
   ]
 };
 
