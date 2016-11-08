@@ -1,9 +1,6 @@
-var createIsCool = require('iscool');
-var _ = require('lodash');
 var callNextTick = require('call-next-tick');
 var probable = require('probable');
-
-var iscool = createIsCool();
+var getWorthwhileWordsFromText = require('./get-worthwhile-words-from-text');
 
 function getSeanceTopic(opts, done) {
   var wordnok;
@@ -14,7 +11,7 @@ function getSeanceTopic(opts, done) {
     text = opts.text;
   }
 
-  var words = worthwhileWordsFromText(text).filter(iscool);
+  var words = getWorthwhileWordsFromText(text);
 
   if (words.length < 1) {
     wordnok.getTopic(done)
@@ -57,20 +54,6 @@ function getSeanceTopic(opts, done) {
       done(null, rarestWord);
     }
   }
-}
-
-function worthwhileWordsFromText(text) {
-  var words = text.split(/[ ":.,;!?#]/);
-  var filteredWords = [];
-  words = _.uniq(_.compact(words));
-  if (words.length > 0) {
-    filteredWords = words.filter(wordDoesNotStartWithAtSymbol);
-  }
-  return filteredWords;
-}
-
-function wordDoesNotStartWithAtSymbol(word) {
-  return word.indexOf('@') === -1;
 }
 
 module.exports = getSeanceTopic;

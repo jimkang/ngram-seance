@@ -26,16 +26,8 @@ function createComposeMessage(opts) {
 
   function composeMessage(words, done) {
     // var message = '@' + originatingTweet.user.screen_name + ' ';
-    var message;
-
-    if (words.length < 2) {
-      callNextTick(done, new Error('Could not get long enough message.'));
-      return;
-    }
-    else {
-      message = ngramChainToSentence(words);
-    }
-
+    var message = words.join(' ');
+    message = message.slice(0, 1).toUpperCase() + message.slice(1);
     message += punctuationTable.roll();
 
     callNextTick(done, null, message);

@@ -29,9 +29,7 @@ function shouldReplyToTweet(opts, done) {
 
   var tweetMentionsBot = doesTweetMentionBot(tweet);
 
-  if (behavior.chimeInUsers.indexOf(tweet.user.screen_name) !== -1 &&
-    !tweetMentionsBot) {
-
+  if (!tweetMentionsBot) {
     // Chiming in.
     waitingPeriod = behavior.hoursToWaitBetweenChimeIns;
   }

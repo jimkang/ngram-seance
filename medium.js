@@ -12,6 +12,9 @@ var createWordnok = require('wordnok').createWordnok;
 var getSeanceTopic = require('./get-seance-topic');
 var createComposeMessage = require('./compose-message');
 var shouldReplyToTweet = require('./should-reply-to-tweet');
+var GetWord2VecNeighbors = require('get-w2v-google-news-neighbors');
+var nounfinder = require('nounfinder');
+var getWorthwhileWordsFromText = require('./get-worthwhile-words-from-text');
 
 var seed = (new Date()).toISOString();
 console.log('seed:', seed);
@@ -29,6 +32,15 @@ var composeMessage = createComposeMessage({
 
 var wordnok = createWordnok({
   apiKey: config.wordnikAPIKey
+});
+
+var getWord2VecNeighbors = GetWord2VecNeighbors({
+  gnewsWord2VecURL: config.gnewsWord2VecURL,
+  nounfinder: nounfinder,
+  probable: probable,
+  wordnok: wordnok,
+  nounLikePhrasesOnly: false,
+  nounWordsOnly: false
 });
 
 var dryRun = false;
@@ -66,8 +78,9 @@ function respondToTweet(tweet) {
   async.waterfall(
     [
       checkIfWeShouldReply,
-      pickWord,
-      runSeance,
+      getNeighborsForTweetWords,
+      pickNeighbors,
+      // runSeance,
       composeMessage,
       postTweet,
       recordThatReplyHappened
@@ -80,6 +93,7 @@ function respondToTweet(tweet) {
       tweet: tweet,
       chronicler: chronicler
     };
+    console.log('Checking tweet from', tweet.user.screen_name);
     shouldReplyToTweet(opts, done);
   }
 
@@ -99,6 +113,24 @@ function respondToTweet(tweet) {
     };
 
     conductSeance(seanceOpts, done);
+  }
+
+  function getNeighborsForTweetWords(done) {
+    var words = getWorthwhileWordsFromText(tweet.text);
+    console.log('words', words);
+    getWord2VecNeighbors(words, done);
+  }
+
+  function pickNeighbors(neighbors, done) {
+    if (!neighbors || neighbors.length < 1) {
+      callNextTick(done, new Error('No neighbors found.'));
+    }
+    else {
+      debugger;
+      var maxWords = probable.rollDie(neighbors.length);
+      var picked = probable.shuffle(neighbors).slice(0, maxWords);
+      callNextTick(done, null, picked);
+    }
   }
 
   function postTweet(text, done) {

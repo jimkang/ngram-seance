@@ -1,16 +1,6 @@
 var behavior = {
-  hoursToWaitBetweenRepliesToSameUser: 5,
-  hoursToWaitBetweenChimeIns: 24,
-  chimeInUsers: [
-    'deathmtn',
-    'paparatti',
-    '15c3po',
-    'grobstein',
-    'tempest67',
-    'godtributes',
-    'desjardins',
-    'poptivist'
-  ]
+  hoursToWaitBetweenRepliesToSameUser: 1/60,
+  hoursToWaitBetweenChimeIns: 25
 };
 
 module.exports = behavior;
