@@ -93,13 +93,13 @@ function respondToTweet(tweet) {
       tweet: tweet,
       chronicler: chronicler
     };
-    console.log('Checking tweet from', tweet.user.screen_name);
+    // console.log('Checking tweet from', tweet.user.screen_name);
     shouldReplyToTweet(opts, done);
   }
 
   function getNeighborsForTweetWords(done) {
     var words = getWorthwhileWordsFromText(tweet.text);
-    console.log('words', words);
+    // console.log('words', words);
     getWord2VecNeighbors(words, done);
   }
 
