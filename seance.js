@@ -1,5 +1,4 @@
 var WanderGoogleNgrams = require('wander-google-ngrams');
-var _ = require('lodash');
 var config = require('./config/config');
 
 var createWanderStream = WanderGoogleNgrams({
@@ -16,7 +15,7 @@ function conductSeance(opts, done) {
     word = opts.word;
     direction = opts.direction;
     characterLimit = opts.characterLimit;
-    maxWordCount = opts.maxWordCount
+    maxWordCount = opts.maxWordCount;
   }
 
   if (!direction) {

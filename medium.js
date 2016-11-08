@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
+/* global process __dirname */
+
 var config = require('./config/config');
 var callNextTick = require('call-next-tick');
 var Twit = require('twit');
 var async = require('async');
 var createChronicler = require('basicset-chronicler').createChronicler;
-var conductSeance = require('./seance');
 var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
 var createWordnok = require('wordnok').createWordnok;
-var getSeanceTopic = require('./get-seance-topic');
 var createComposeMessage = require('./compose-message');
 var shouldReplyToTweet = require('./should-reply-to-tweet');
 var GetWord2VecNeighbors = require('get-w2v-google-news-neighbors');
@@ -97,24 +97,6 @@ function respondToTweet(tweet) {
     shouldReplyToTweet(opts, done);
   }
 
-  function pickWord(done) {
-    var topicOpts = {
-      wordnok: wordnok,
-      text: tweet.text
-    };
-    getSeanceTopic(topicOpts, done);
-  }
-
-  function runSeance(word, done) {
-    var seanceOpts = {
-      word: word,
-      direction: 'forward',
-      maxWordCount: 20
-    };
-
-    conductSeance(seanceOpts, done);
-  }
-
   function getNeighborsForTweetWords(done) {
     var words = getWorthwhileWordsFromText(tweet.text);
     console.log('words', words);
@@ -126,7 +108,6 @@ function respondToTweet(tweet) {
       callNextTick(done, new Error('No neighbors found.'));
     }
     else {
-      debugger;
       var maxWords = probable.rollDie(neighbors.length);
       var picked = probable.shuffle(neighbors).slice(0, maxWords);
       callNextTick(done, null, picked);
@@ -152,7 +133,7 @@ function respondToTweet(tweet) {
       };
       twit.post('statuses/update', body, done);
     }
-    }
+  }
 
   // TODO: All of these async tasks should have just (opts, done) params.
   function recordThatReplyHappened(closingTweetData, response, done) {

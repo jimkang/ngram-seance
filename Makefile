@@ -43,3 +43,6 @@ followback:
 
 tweet-unprompted:
 	node tweet-seance.js
+
+lint:
+	./node_modules/.bin/eslint .

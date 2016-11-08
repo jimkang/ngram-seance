@@ -2,8 +2,6 @@ var test = require('tape');
 var getSeanceTopic = require('../get-seance-topic');
 var callNextTick = require('call-next-tick');
 var _ = require('lodash');
-var config = require('../config/config');
-var createWordnok = require('wordnok').createWordnok;
 
 function createMockWordnok(frequencies) {
   // return createWordnok({

@@ -14,7 +14,7 @@ function getSeanceTopic(opts, done) {
   var words = getWorthwhileWordsFromText(text);
 
   if (words.length < 1) {
-    wordnok.getTopic(done)
+    wordnok.getTopic(done);
     return;
   }
 
@@ -31,28 +31,27 @@ function getSeanceTopic(opts, done) {
   wordnok.getWordFrequencies(words, getRarest);
 
   function getRarest(error, frequencies) {
+    var rarestFrequency = 1000000;
+    var rarestWord;
+
     if (error) {
       done(error);
     }
     else {
-      var rarestFrequency = 1000000;
-      var rarestWord;
-
       frequencies.forEach(saveRarest);
-
-      function saveRarest(freq, i) {
-        if (freq === 0) {
-          freq = 99999;
-        }
-
-        if (freq < rarestFrequency) {
-          rarestFrequency = freq;
-          rarestWord = words[i];
-        }
-      }
-
       done(null, rarestWord);
     }
+
+    function saveRarest(freq, i) {
+      if (freq === 0) {
+        freq = 99999;
+      }
+
+      if (freq < rarestFrequency) {
+        rarestFrequency = freq;
+        rarestWord = words[i];
+      }
+    }    
   }
 }
 
