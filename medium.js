@@ -15,6 +15,12 @@ var shouldReplyToTweet = require('./should-reply-to-tweet');
 var GetWord2VecNeighbors = require('get-w2v-google-news-neighbors');
 var nounfinder = require('nounfinder');
 var getWorthwhileWordsFromText = require('./get-worthwhile-words-from-text');
+var EphemeralReplyCounter = require('./ephemeral-reply-counter');
+var behavior = require('./behavior');
+
+var recentReplyCounter = EphemeralReplyCounter({
+  expirationTimeInSeconds: behavior.counterExpirationSeconds
+});
 
 var seed = (new Date()).toISOString();
 console.log('seed:', seed);
@@ -75,7 +81,8 @@ function respondToTweet(tweet) {
   function checkIfWeShouldReply(done) {
     var opts = {
       tweet: tweet,
-      chronicler: chronicler
+      chronicler: chronicler,
+      recentReplyCounter: recentReplyCounter
     };
     // console.log('Checking tweet from', tweet.user.screen_name);
     shouldReplyToTweet(opts, done);
@@ -121,6 +128,7 @@ function respondToTweet(tweet) {
 
   // TODO: All of these async tasks should have just (opts, done) params.
   function recordThatReplyHappened(closingTweetData, response, done) {
+    recentReplyCounter.incrementForKey(tweet.user.screen_name);
     // TODO: recordThatUserWasRepliedTo should be async.
     chronicler.recordThatUserWasRepliedTo(tweet.user.id_str);
     callNextTick(done);

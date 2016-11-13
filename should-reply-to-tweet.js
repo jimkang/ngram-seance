@@ -10,10 +10,12 @@ function shouldReplyToTweet(opts, done) {
   var tweet;
   var chronicler;
   var waitingPeriod;
+  var recentReplyCounter;
 
   if (opts) {
     tweet = opts.tweet;
     chronicler = opts.chronicler;
+    recentReplyCounter = opts.recentReplyCounter;
   }
 
   var tweetLocale = 'en';
@@ -44,8 +46,18 @@ function shouldReplyToTweet(opts, done) {
     waitingPeriod = behavior.secondsToWaitBetweenChimeIns;
   }
   else if (tweetMentionsBot) {
-    // Replying.
-    waitingPeriod = behavior.secondsToWaitBetweenRepliesToSameUser;
+    if (recentReplyCounter.getCountForKey(tweet.user.screen_name) >=
+      behavior.maxRepliesInCounterLifetime) {
+
+      callNextTick(
+        done, new Error('Already replied enough recently to ' + tweet.user.screen_name)
+      );
+      return;
+    }
+    else {
+      // Probably replying.
+      waitingPeriod = behavior.secondsToWaitBetweenRepliesToSameUser;
+    }
   }
   else {
     callNextTick(done, new Error('Not chiming in or replying.'));
