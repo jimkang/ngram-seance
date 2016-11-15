@@ -3,19 +3,21 @@ var betterKnowATweet = require('better-know-a-tweet');
 var async = require('async');
 var behavior = require('./behavior');
 
-var username = 'cleromancer';
-
 // Passes an error if you should not reply.
 function shouldReplyToTweet(opts, done) {
   var tweet;
   var chronicler;
   var waitingPeriod;
+  var config;
   var recentReplyCounter;
+  var probable;
 
   if (opts) {
     tweet = opts.tweet;
     chronicler = opts.chronicler;
+    config = opts.config;
     recentReplyCounter = opts.recentReplyCounter;
+    probable = opts.probable;
   }
 
   var tweetLocale = 'en';
@@ -28,13 +30,12 @@ function shouldReplyToTweet(opts, done) {
     callNextTick(done, new Error('No English input.'));
     return;
   }
-
-  if (tweet.user.screen_name === username) {
+  if (tweet.user.screen_name === config.username) {
     callNextTick(done, new Error('Subject tweet is own tweet.'));
     return;
   }
 
-  if (betterKnowATweet.isRetweetOfUser(username, tweet)) {
+  if (betterKnowATweet.isRetweetOfUser(config.username, tweet)) {
     callNextTick(done, new Error('Subject tweet is own retweet.'));
     return;
   }
@@ -46,8 +47,18 @@ function shouldReplyToTweet(opts, done) {
     waitingPeriod = behavior.secondsToWaitBetweenChimeIns;
   }
   else if (tweetMentionsBot) {
+    var maxRepliesInCounterLifetime = behavior.maxRepliesInCounterLifetime;
+
+    if (behavior.limitedRepliesScreenNames.indexOf(tweet.user.screen_name) !== -1) {
+      maxRepliesInCounterLifetime = behavior.maxLimitedRepliesInCounterLifetime;
+
+      if (probable.rollDie(100) > behavior.chanceOfReplyingToLimitedReplyUser) {
+        maxRepliesInCounterLifetime = 0;
+      }
+    }
+
     if (recentReplyCounter.getCountForKey(tweet.user.screen_name) >=
-      behavior.maxRepliesInCounterLifetime) {
+      maxRepliesInCounterLifetime) {
 
       callNextTick(
         done, new Error('Already replied enough recently to ' + tweet.user.screen_name)
@@ -108,11 +119,11 @@ function shouldReplyToTweet(opts, done) {
       ));
     }
   }
-}
 
-function doesTweetMentionBot(tweet) {
-  var usernames = betterKnowATweet.whosInTheTweet(tweet);
-  return usernames && usernames.indexOf(username) !== -1;
+  function doesTweetMentionBot(tweet) {
+    var usernames = betterKnowATweet.whosInTheTweet(tweet);
+    return usernames && usernames.indexOf(config.username) !== -1;
+  }
 }
 
 module.exports = shouldReplyToTweet;

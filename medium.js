@@ -82,7 +82,9 @@ function respondToTweet(tweet) {
     var opts = {
       tweet: tweet,
       chronicler: chronicler,
-      recentReplyCounter: recentReplyCounter
+      recentReplyCounter: recentReplyCounter,
+      config: config,
+      probable: probable
     };
     // console.log('Checking tweet from', tweet.user.screen_name);
     shouldReplyToTweet(opts, done);
