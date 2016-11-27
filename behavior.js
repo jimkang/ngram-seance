@@ -6,9 +6,11 @@ var behavior = {
   limitedRepliesScreenNames: [
     'magicapplier',
     'improvebot',
-    'cleromancer'
+    'cleromancer',
+    'godtributes',
+    'cryptbooks'
   ],
-  chanceOfReplyingToLimitedReplyUser: 50,
+  chanceOfReplyingToLimitedReplyUser: 5,
   secondsToWaitBetweenChimeIns: 12 * 60 * 60,
   maxNumberOfTimesToTalkAboutTopicPerUser: 3,
   doNotUseWordsForScreenNames: {
