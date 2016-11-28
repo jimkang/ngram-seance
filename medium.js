@@ -17,6 +17,8 @@ var nounfinder = require('nounfinder');
 var getWorthwhileWordsFromText = require('./get-worthwhile-words-from-text');
 var EphemeralReplyCounter = require('./ephemeral-reply-counter');
 var behavior = require('./behavior');
+var createIsCool = require('iscool');
+var iscool = createIsCool();
 
 var recentReplyCounter = EphemeralReplyCounter({
   expirationTimeInSeconds: behavior.counterExpirationSeconds
@@ -97,12 +99,13 @@ function respondToTweet(tweet) {
   }
 
   function pickNeighbors(neighbors, done) {
-    if (!neighbors || neighbors.length < 1) {
+    var goodNeighbors = neighbors.filter(iscool);
+    if (!goodNeighbors || goodNeighbors.length < 1) {
       callNextTick(done, new Error('No neighbors found.'));
     }
     else {
-      var maxWords = probable.rollDie(neighbors.length);
-      var picked = probable.shuffle(neighbors).slice(0, maxWords);
+      var maxWords = probable.rollDie(goodNeighbors.length);
+      var picked = probable.shuffle(goodNeighbors).slice(0, maxWords);
       callNextTick(done, null, picked);
     }
   }
