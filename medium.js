@@ -24,7 +24,7 @@ var recentReplyCounter = EphemeralReplyCounter({
   expirationTimeInSeconds: behavior.counterExpirationSeconds
 });
 
-var seed = (new Date()).toISOString();
+var seed = new Date().toISOString();
 console.log('seed:', seed);
 var random = seedrandom(seed);
 
@@ -51,7 +51,7 @@ var getWord2VecNeighbors = GetWord2VecNeighbors({
 
 var dryRun = false;
 if (process.argv.length > 2) {
-  dryRun = (process.argv[2].toLowerCase() == '--dry');
+  dryRun = process.argv[2].toLowerCase() == '--dry';
 }
 
 var chronicler = createChronicler({
@@ -102,8 +102,7 @@ function respondToTweet(tweet) {
     var goodNeighbors = neighbors.filter(iscool);
     if (!goodNeighbors || goodNeighbors.length < 1) {
       callNextTick(done, new Error('No neighbors found.'));
-    }
-    else {
+    } else {
       var maxWords = probable.rollDie(goodNeighbors.length);
       var picked = probable.shuffle(goodNeighbors).slice(0, maxWords);
       callNextTick(done, null, picked);
@@ -117,12 +116,11 @@ function respondToTweet(tweet) {
       console.log('Would have tweeted:', text);
       var mockTweetData = {
         user: {
-          id_str: 'mockuser',        
+          id_str: 'mockuser'
         }
       };
       callNextTick(done, null, mockTweetData);
-    }
-    else {
+    } else {
       var body = {
         status: text,
         in_reply_to_status_id: tweet.id_str

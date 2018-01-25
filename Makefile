@@ -46,3 +46,6 @@ tweet-unprompted:
 
 lint:
 	./node_modules/.bin/eslint .
+
+prettier:
+	prettier --single-quote --write "**/*.js"

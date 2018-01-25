@@ -18,7 +18,6 @@ function createMockWordnok(frequencies) {
   };
 }
 
-
 var testCases = [
   {
     opts: {
@@ -35,8 +34,7 @@ var testCases = [
     mockFrequencies: [],
     expectError: false,
     expected: 'backup'
-  }
-  ,
+  },
   {
     opts: {
       text: 'shoe'
@@ -58,8 +56,7 @@ function runTest(testCase) {
     function checkTopic(error, topic) {
       if (testCase.expectError) {
         t.ok(error, 'Error is passed back.');
-      }
-      else {
+      } else {
         t.ok(!error, 'No error while getting topic.');
         t.equal(topic, testCase.expected, 'Topic is correctly chosen.');
       }

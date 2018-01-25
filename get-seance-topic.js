@@ -36,8 +36,7 @@ function getSeanceTopic(opts, done) {
 
     if (error) {
       done(error);
-    }
-    else {
+    } else {
       frequencies.forEach(saveRarest);
       done(null, rarestWord);
     }
@@ -51,7 +50,7 @@ function getSeanceTopic(opts, done) {
         rarestFrequency = freq;
         rarestWord = words[i];
       }
-    }    
+    }
   }
 }
 

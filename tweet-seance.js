@@ -13,10 +13,10 @@ var getDotChain = require('./get-dot-chain');
 
 var dryRun = false;
 if (process.argv.length > 2) {
-  dryRun = (process.argv[2].toLowerCase() == '--dry');
+  dryRun = process.argv[2].toLowerCase() == '--dry';
 }
 
-var seed = (new Date()).toISOString();
+var seed = new Date().toISOString();
 console.log('seed:', seed);
 
 var random = seedrandom(seed);
@@ -37,16 +37,9 @@ var twit = new Twit(config.twitter);
 
 if (probable.roll(7) === 0) {
   postTweet(getDotChain(probable.roll(100)), wrapUp);
-}
-else {
+} else {
   async.waterfall(
-    [
-      getTopics,
-      pickFirst,
-      runSeance,
-      composeMessage,
-      postTweet,
-    ],
+    [getTopics, pickFirst, runSeance, composeMessage, postTweet],
     wrapUp
   );
 }
@@ -58,14 +51,13 @@ function getTopics(done) {
       limit: 1
     }
   };
-  wordnok.getRandomWords(opts, done);  
+  wordnok.getRandomWords(opts, done);
 }
 
 function pickFirst(words, done) {
   if (words.length < 1) {
     callNextTick(done, new Error('No topics found.'));
-  }
-  else {
+  } else {
     callNextTick(done, null, words[0]);
   }
 }
@@ -85,8 +77,7 @@ function postTweet(text, done) {
   var preface;
   if (probable.roll(3) === 0) {
     preface = getDotChain(3 + probable.roll(20));
-  }
-  else {
+  } else {
     preface = getGateOpenMessage();
   }
 
@@ -97,12 +88,11 @@ function postTweet(text, done) {
     console.log('Would have tweeted:', text);
     var mockTweetData = {
       user: {
-        id_str: 'mockuser',        
+        id_str: 'mockuser'
       }
     };
     callNextTick(done, null, mockTweetData);
-  }
-  else {
+  } else {
     var body = {
       status: text
     };

@@ -2,7 +2,7 @@ var WanderGoogleNgrams = require('wander-google-ngrams');
 var config = require('./config/config');
 
 var createWanderStream = WanderGoogleNgrams({
-  wordnikAPIKey: config.wordnikAPIKey  
+  wordnikAPIKey: config.wordnikAPIKey
 });
 
 function conductSeance(opts, done) {
@@ -62,12 +62,10 @@ function conductSeance(opts, done) {
   function saveWord(word) {
     if (characterLimit === undefined) {
       words.push(word);
-    }
-    else {
+    } else {
       if (words.join(' ').length + word.length + 1 <= characterLimit) {
         words.push(word);
-      }
-      else {
+      } else {
         console.log('hit char limit with word', word);
         wanderStream.end();
       }
